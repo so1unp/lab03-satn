@@ -4,8 +4,9 @@
 #include <sys/times.h>      // times()
 #include <unistd.h> // getpid()
 #include <sys/wait.h> // wait()
-#include <signal.h> // struct rusage
+#include <signal.h>
 #include <string.h>
+#include <sys/resource.h>
 
 
 #define NUMB_OF_ARGUMENTS 3
@@ -26,7 +27,7 @@ void sig_handler(int p) {
     struct rusage usage;
     getrusage(RUSAGE_SELF, &usage);
     //printf("\nChild %d (nice %2d):\t%3li\n", getpid(), getpriority(PRIO_PROCESS,getpid()), usage->ru_stime);
-    printf("\nChild %d \t%3li\n", getpid(), usage->ru_stime);
+    printf("\nChild %d \t%3li segundos?\n", getpid(), usage.ru_stime.tv_sec);
     exit(EXIT_SUCCESS);
 }
 
