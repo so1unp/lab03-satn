@@ -19,6 +19,7 @@
 
 #define MAXARGS 10
 
+#define BUFFER_SIZE 256
 // All commands have at least a type. Have looked at the type, the code
 // typically casts the *cmd to some specific cmd type.
 struct cmd {
@@ -66,17 +67,27 @@ void runcmd(struct cmd *cmd)
             ecmd = (struct execcmd *) cmd;
             if (ecmd->argv[0] == 0)
                 exit(0);
-            if(execvp(ecmd->argv[0], ecmd->argv)) {
-              fprintf(stderr, "exec not implemented\n");
+            
+            if(execvp(ecmd->argv[0],ecmd->argv) < 0){
+                perror("");
+                exit(-1);
             }
-            //fprintf(stderr, "exec not implemented\n");
-            // Your code here ...
             break;
 
         case REDIR:
-            fprintf(stderr, "redir not implemented\n");
-            // Your code here ...
             rcmd = (struct redircmd *) cmd;
+            // Como los files decript en Unix se asignan con el numero mas bajo posible al cerrar la entrada estandar va a utilizar el ultimo file decript abierto
+            if(rcmd->mode == 0){
+                close(STDIN_FILENO);
+                rcmd->fd = open(rcmd->file,O_RDONLY);
+            }else{
+                close(STDOUT_FILENO);
+                rcmd->fd = open(rcmd->file,O_WRONLY | O_CREAT| O_TRUNC,0644);
+            }
+            if(rcmd->fd < 0){
+                perror("");
+                exit(-1);
+            }
             runcmd(rcmd->cmd);
             break;
 
