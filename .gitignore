@@ -69,3 +69,5 @@ bin/*
 
 # Carpeta de .vscode
 .vscode
+
+*.txt
